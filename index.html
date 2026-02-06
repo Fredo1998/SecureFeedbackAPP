@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFeedback - Registro Seguro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 800px; }
+        h1 { color: #0078d4; text-align: center; margin-bottom: 30px; }
+        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        button { padding: 12px; background-color: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #005a9e; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Registro de Usuarios Seguro</h1>
+        
+        <form action="/registrar" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre completo" required>
+            <input type="email" name="correo" placeholder="Correo electrónico" required>
+            <button type="submit">Registrar en Azure SQL</button>
+        </form>
+
+        <h2>Lista de Usuarios (Nube)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Registro</th>
+                </tr>
+            </thead>
+            <tbody id="lista-usuarios"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function cargarDatos() {
+            try {
+                const res = await fetch('/api/usuarios');
+                const datos = await res.json();
+                const tabla = document.getElementById('lista-usuarios');
+                tabla.innerHTML = ""; 
+
+                datos.forEach(user => {
+                    const fila = document.createElement('tr');
+                    
+                    // SEGURIDAD: textContent neutraliza scripts maliciosos (Anti-XSS)
+                    const tdNom = document.createElement('td');
+                    tdNom.textContent = user.nombre; 
+                    
+                    const tdCor = document.createElement('td');
+                    tdCor.textContent = user.correo;
+                    
+                    const tdFec = document.createElement('td');
+                    tdFec.textContent = new Date(user.fecha_registro).toLocaleString();
+                    
+                    fila.append(tdNom, tdCor, tdFec);
+                    tabla.appendChild(fila);
+                });
+            } catch (e) { console.error("Error al cargar datos", e); }
+        }
+        cargarDatos();
+    </script>
+</body>
+</html>
